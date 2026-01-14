@@ -1,0 +1,1 @@
+Monorepo for Finance Log – infrastructure, backend, and frontend.
