@@ -21,7 +21,7 @@
     "hostedZoneDomain":"finance-log.com",
     "applicationDomain":"api.finance-log.com",
     "imageTag":"latest",
-    "sslCertificateArn": null,
+    "sslCertificateArn": "arn:aws:acm:ap-south-1:654654630643:certificate/c8fd4161-aaee-4cac-bccd-1db930b25af0",
     "@aws-cdk/aws-signer:signingProfileNamePassedToCfn": true,
     "@aws-cdk/aws-ecs-patterns:secGroupsDisablesImplicitOpenListener": true,
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
