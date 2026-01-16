@@ -88,7 +88,7 @@ public class RepositoryApp {
                 new RepositoryConstruct.RepositoryInputParameters(
                         applicationName,
                         accountId,
-                        5,
+                        10,
                         false
                 ));
 
