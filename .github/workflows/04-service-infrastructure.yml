@@ -58,9 +58,9 @@ jobs:
           
       - name: Login to AWS ECR
         run: |
-          aws ecr get-login-password --region ${AWS_REGION} \
+          aws ecr get-login-password --region ${AWS_DEFAULT_REGION} \
           | docker login --username AWS --password-stdin \
-            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
 
       - name: Build and Push Docker image
         env:
@@ -69,9 +69,9 @@ jobs:
         run: |
           docker build -t finance-log .
           docker tag finance-log \
-            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/finance-log:${TAG}
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/finance-log:${TAG}
           docker push \
-            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/finance-log:${TAG}
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/finance-log:${TAG}
 
   deploy:
     runs-on: ubuntu-latest
