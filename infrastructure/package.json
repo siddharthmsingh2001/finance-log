@@ -16,9 +16,13 @@
     "service:deploy": "cdk deploy --require-approval never --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.ServiceApp\"",
     "service:destroy": "cdk destroy --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.ServiceApp\"",
 
-    "certificate:synth": "cdk synth --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.CertificateApp\"",
-    "certificate:deploy": "cdk deploy --require-approval never --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.CertificateApp\"",
-    "certificate:destroy": "cdk destroy --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.CertificateApp\"",
+    "api-certificate:synth": "cdk synth --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.BackendCertificateApp\"",
+    "api-certificate:deploy": "cdk deploy --require-approval never --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.BackendCertificateApp\"",
+    "api-certificate:destroy": "cdk destroy --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.BackendCertificateApp\"",
+
+    "app-certificate:synth": "cdk synth --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.FrontendCertificateApp\"",
+    "app-certificate:deploy": "cdk deploy --require-approval never --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.FrontendCertificateApp\"",
+    "app-certificate:destroy": "cdk destroy --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.FrontendCertificateApp\"",
 
     "domain:synth": "cdk synth --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.DomainApp\"",
     "domain:deploy": "cdk deploy --require-approval never --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.DomainApp\"",

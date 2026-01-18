@@ -26,7 +26,7 @@ import software.amazon.awscdk.Environment;
  * This app follows the "one stack per app" pattern to keep
  * infrastructure components loosely coupled and independently deployable.
  */
-public class CertificateApp {
+public class BackendCertificateApp {
 
     /**
      * Main entry point for the CDK application.
@@ -68,7 +68,7 @@ public class CertificateApp {
         /*
          * The exact hostname that the frontend will connect to via HTTPs e.g. api.finance-log.com OR app.finance-log.com
          */
-        String applicationDomain = (String) app.getNode().tryGetContext("applicationDomain");
+        String applicationDomain = (String) app.getNode().tryGetContext("apiDomain");
         Validations.requireNonEmpty(applicationDomain, "context variable 'applicationDomain' must not be null");
 
         /*
@@ -94,7 +94,7 @@ public class CertificateApp {
          */
         new CertificateStack(
                 app,
-                "CertificateStack",
+                "BackendCertificateStack",
                 awsEnvironment,
                 applicationEnvironment,
                 applicationDomain,
