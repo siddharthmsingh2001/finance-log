@@ -15,14 +15,14 @@ import software.amazon.awscdk.services.route53.targets.LoadBalancerTarget;
 import software.constructs.Construct;
 
 /**
- * CDK stack responsible for managing DNS records for the application domain.
+ * CDK stack responsible for managing DNS records for the api domain.
  *
  * <p>
  * This stack:
  * <ul>
  *   <li>Imports an existing Route 53 public hosted zone</li>
  *   <li>Imports an existing Application Load Balancer (ALB)</li>
- *   <li>Creates an alias A record pointing the application domain to the ALB</li>
+ *   <li>Creates an alias A record pointing the api domain to the ALB</li>
  * </ul>
  *
  * <p>
@@ -33,10 +33,10 @@ import software.constructs.Construct;
  *   <li>Load balancer attributes are stored in SSM Parameter Store</li>
  * </ul>
  */
-public class DomainStack extends Stack {
+public class BackendDomainStack extends Stack {
 
     /**
-     * Creates a new {@link DomainStack}.
+     * Creates a new {@link BackendDomainStack}.
      *
      * @param scope                  parent construct (usually the CDK {@link App})
      * @param constructId            logical identifier for the stack
@@ -45,7 +45,7 @@ public class DomainStack extends Stack {
      * @param hostedZoneDomain       root domain of the Route 53 hosted zone
      * @param applicationDomain      fully qualified domain name to be routed to the ALB
      */
-    public DomainStack(
+    public BackendDomainStack(
             final Construct scope,
             final String constructId,
             final Environment awsEnvironment,
@@ -60,7 +60,7 @@ public class DomainStack extends Stack {
                 scope,
                 constructId,
                 StackProps.builder()
-                        .stackName(applicationEnvironment.prefix("domain-stack"))
+                        .stackName(applicationEnvironment.prefix("backend-domain-stack"))
                         .env(awsEnvironment)
                         .build()
         );
@@ -124,7 +124,7 @@ public class DomainStack extends Stack {
          * Alias records are AWS-managed pointers and do not incur
          * additional DNS query charges.
          */
-        ARecord aRecord = ARecord.Builder.create(this, "ARecord")
+        ARecord aRecord = ARecord.Builder.create(this, "AlbARecord")
                 .recordName(applicationDomain)
                 .zone(hostedZone)
                 .target(RecordTarget.fromAlias(new LoadBalancerTarget(applicationLoadBalancer)))

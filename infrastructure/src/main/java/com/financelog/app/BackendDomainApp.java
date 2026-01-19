@@ -3,7 +3,7 @@ package com.financelog.app;
 import com.financelog.core.ApplicationEnvironment;
 import com.financelog.core.DeploymentStage;
 import com.financelog.core.Validations;
-import com.financelog.domain.DomainStack;
+import com.financelog.domain.BackendDomainStack;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 
@@ -17,7 +17,7 @@ import software.amazon.awscdk.Environment;
  *   <li>Reads deployment configuration from CDK context</li>
  *   <li>Validates required inputs</li>
  *   <li>Constructs an {@link ApplicationEnvironment}</li>
- *   <li>Instantiates the {@link DomainStack}</li>
+ *   <li>Instantiates the {@link BackendDomainStack}</li>
  *   <li>Synthesizes the CloudFormation template</li>
  * </ul>
  *
@@ -29,7 +29,7 @@ import software.amazon.awscdk.Environment;
  *   <li>Network stack outputs are available in SSM Parameter Store</li>
  * </ul>
  */
-public class DomainApp {
+public class BackendDomainApp {
 
     /**
      * Main entry point for the CDK application.
@@ -74,7 +74,7 @@ public class DomainApp {
         /*
          * The exact hostname that the frontend will connect to via HTTPs e.g. api.finance-log.com OR app.finance-log.com
          */
-        String applicationDomain = (String) app.getNode().tryGetContext("applicationDomain");
+        String applicationDomain = (String) app.getNode().tryGetContext("apiDomain");
         Validations.requireNonEmpty(applicationDomain, "context variable 'applicationDomain' must not be null");
 
         /*
@@ -98,9 +98,9 @@ public class DomainApp {
         /*
          * Stack responsible for associating a Custom Domain for the ELB.
          */
-        new DomainStack(
+        new BackendDomainStack(
                 app,
-                "DomainStack",
+                "BackendDomainStack",
                 awsEnvironment,
                 applicationEnvironment,
                 hostedZoneDomain,
