@@ -9,7 +9,7 @@ import software.amazon.awscdk.Environment;
 
 /**
  * CDK application entry point responsible for configuring
- * DNS routing for the application domain.
+ * DNS routing for the api domain.
  *
  * <p>
  * This application:

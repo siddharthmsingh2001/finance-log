@@ -18,6 +18,7 @@ import software.constructs.Construct;
  * The certificate is validated using DNS validation via Route 53
  * and is intended to be reused by other stacks (e.g. ALB, CloudFront,
  * API Gateway) through CloudFormation exports.
+ * </p>
  */
 public class CertificateStack extends Stack {
 
@@ -56,7 +57,7 @@ public class CertificateStack extends Stack {
         /*
          * Retrieve the Hosted Zone(A container that holds all the DNS
          * records for a specific domain) that was created when we registered
-         * out domain through Route 53
+         * our domain through Route 53
          */
         IHostedZone hostedZone = HostedZone.fromLookup(
                 this,
@@ -77,7 +78,8 @@ public class CertificateStack extends Stack {
 
         /*
          * Exports the certificate ARN so it can be imported
-         * and reused by other CloudFormation stacks like NetworkStack.
+         * and reused by other CloudFormation stacks like NetworkStack
+         * or FrontendDomainStack
          */
         new CfnOutput(
                 this,

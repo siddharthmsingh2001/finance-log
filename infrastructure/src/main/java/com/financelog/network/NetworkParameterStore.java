@@ -96,7 +96,7 @@ public class NetworkParameterStore {
         ).getStringValue();
     }
 
-    /*
+    /**
      * Retrieves a list-valued parameter from SSM.
      */
     private static List<String> getList(Construct scope, DeploymentStage stage, String key, ParameterValueType valueType){

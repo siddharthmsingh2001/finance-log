@@ -47,7 +47,7 @@ import java.util.Map;
  *   -c environmentName=dev \
  *   -c applicationName=finance-log \
  *   -c accountId=123456789012 \
- *   -c region=us-east-1 \
+ *   -c region=ap-south-1 \
  *   -c springProfile=dev
  * </pre>
  */

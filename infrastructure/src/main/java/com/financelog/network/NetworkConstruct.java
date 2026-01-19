@@ -63,6 +63,7 @@ import com.financelog.core.DeploymentStage;
  *   <li>Defining subnets and availability constraints</li>
  *   <li>Provisioning the ECS Cluster bound to the VPC</li>
  *   <li>Creating and configuring the Application Load Balancer</li>
+ *   <li>Creating and configuring the Http & Https Listeners</li>
  *   <li>Exposing critical network identifiers via SSM Parameters</li>
  * </ul>
  *
@@ -187,7 +188,7 @@ public class NetworkConstruct extends Construct{
 
         // A VPC Gateway Endpoint to allow resources in private subnet to connect to S3 & DynamoDB Services
         createGatewayEndpoint();
-        // A VPC Interface Endpoint to allow resorces in private subnet to connect to ECR, SNS, SQS etc
+        // A VPC Interface Endpoint to allow resources in private subnet to connect to ECR, SNS, SQS etc
         createInterfaceEndpoint();
 
         // Compute orchestration layer tied to the VPC
@@ -207,7 +208,7 @@ public class NetworkConstruct extends Construct{
     /**
      * Creates the Virtual Private Cloud used by the application.
      * A private, isolated network inside AWS that nothing can enter
-     * or leave enless you explicitly allow it.
+     * or leave unless you explicitly allow it.
      *
      * <p>
      * The VPC is intentionally minimal:
@@ -244,6 +245,7 @@ public class NetworkConstruct extends Construct{
                 )
                 .build();
     }
+
     /**
      * Creates a Gateway VPC Endpoint for Amazon S3.
      *
@@ -280,9 +282,6 @@ public class NetworkConstruct extends Construct{
      *   <li>Accessing S3 without NAT Gateway cost</li>
      * </ul>
      *
-     * <p>
-     * <strong>Cost:</strong> Free (no hourly or data processing charges).
-     * </p>
      */
     private void createGatewayEndpoint() {
         vpc.addGatewayEndpoint("S3Endpoint",
@@ -408,14 +407,14 @@ public class NetworkConstruct extends Construct{
      * Creates and configures the Application Load Balancer.
      *
      * <p>
-     * ALB distributes incoming HTTP/s traffc across multiple
+     * ALB distributes incoming HTTP/s traffic across multiple
      * Targets based on request attribute.
-     * The listener in lb recive requests matching the protocol
-     * and port we configure. The receving listener evaluates the
-     * request against the ruleswe specify and if applicable
-     * routes the request to appropriate targt fom the target group.
+     * The listener in lb receive requests matching the protocol
+     * and port we configure. The receiving listener evaluates the
+     * request against the rules we specify and if applicable
+     * routes the request to appropriate target fom the target group.
      * We can use HTTPS listener to offload the work of TLS
-     * ecvryption and decryption
+     * encryption and decryption
      * to ALB.
      * </p>
      *
@@ -456,13 +455,13 @@ public class NetworkConstruct extends Construct{
         // Application loadbalancer
         IApplicationLoadBalancer applicationLoadBalancer = ApplicationLoadBalancer.Builder.create(this, "LoadBalancer")
                 .loadBalancerName(prefixWithEnvironmentName("lb"))
-                .vpc(vpc) // alb creates an Network Interface in the VPC it lives in.
+                .vpc(vpc) // alb creates a Network Interface in the VPC it lives in.
                 .internetFacing(true) // indicates that alb accepts traffic from internet and is not just for internal traffic
                 .securityGroup(loadbalancerSecurityGroup)
                 .build();
 
-        // A Dummy Application Target Group so that we create ALB Listener here in the Network Construct. It will be overriden in the ServiceConstruct
-        IApplicationTargetGroup dummyAplicationTargetGroup = ApplicationTargetGroup.Builder.create(this, "DummyApplicationTargetGroup")
+        // A Dummy Application Target Group so that we create ALB Listener here in the Network Construct. It will be overridden in the ServiceConstruct
+        IApplicationTargetGroup dummyApplicationTargetGroup = ApplicationTargetGroup.Builder.create(this, "DummyApplicationTargetGroup")
                 .vpc(vpc)
                 .port(8080) // this must match the container port.
                 .protocol(ApplicationProtocol.HTTP) // ALB uses HTTP to communicate with container and terminates TLS.
@@ -473,26 +472,26 @@ public class NetworkConstruct extends Construct{
                         HealthCheck.builder()
                                 .interval(Duration.seconds(10)) // every 10 seconds ALB pings the target
                                 .timeout(Duration.seconds(5)) // if no response in 5 seconds consider it failure
-                                .healthyThresholdCount(2) // 2 consequtive success means target is healthy
+                                .healthyThresholdCount(2) // 2 consecutive success means target is healthy
                                 .build())
                 .build();
 
         // Listener determines the entry point of the ALB on which port + protocol should I accept incoming traffic, here we have a default HTTP Listener.
-        this.httpListener = applicationLoadBalancer.addListener("HttpListner", BaseApplicationListenerProps.builder()
+        this.httpListener = applicationLoadBalancer.addListener("HttpListener", BaseApplicationListenerProps.builder()
                 .port(80)
                 .protocol(ApplicationProtocol.HTTP)
                 .open(true)
                 .build()
         );
         httpListener.addTargetGroups("HttpTargetGroup", AddApplicationTargetGroupsProps.builder()
-                .targetGroups(Collections.singletonList(dummyAplicationTargetGroup))
+                .targetGroups(Collections.singletonList(dummyApplicationTargetGroup))
                 .build()
         );
 
         // Optional HTTPS Listener configuration
         inputParameters.getSslCertificateArn().ifPresent(
                 sslCertificateArn -> {
-                    this.httpsListener = applicationLoadBalancer.addListener("HttpsListner", BaseApplicationListenerProps.builder()
+                    this.httpsListener = applicationLoadBalancer.addListener("HttpsListener", BaseApplicationListenerProps.builder()
                             .port(443)
                             .protocol(ApplicationProtocol.HTTPS)
                             .certificates(List.of(ListenerCertificate.fromArn(sslCertificateArn)))
@@ -500,7 +499,7 @@ public class NetworkConstruct extends Construct{
                             .build()
                     );
                     httpsListener.addTargetGroups("HttpsTargetGroup", AddApplicationTargetGroupsProps.builder()
-                            .targetGroups(List.of(dummyAplicationTargetGroup))
+                            .targetGroups(List.of(dummyApplicationTargetGroup))
                             .build()
                     );
 

@@ -20,6 +20,7 @@ import software.amazon.awscdk.StackProps;
  * <ul>
  *   <li>VPC and subnet topology</li>
  *   <li>Application Load Balancer</li>
+ *   <li>Http & Https Listeners</li/>
  *   <li>ECS Cluster</li>
  * </ul>
  *

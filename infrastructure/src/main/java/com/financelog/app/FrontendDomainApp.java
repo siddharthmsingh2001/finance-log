@@ -8,8 +8,24 @@ import com.financelog.core.DeploymentStage;
 import com.financelog.core.Validations;
 
 /**
- * CDK application entry point responsible for creating
- * Route 53 DNS records for the frontend.
+ * CDK application entry point responsible for configuring
+ * DNS routing for the app domain.
+ *
+ * <p>
+ * This application:
+ * <ul>
+ *   <li>Constructs an {@link ApplicationEnvironment}</li>
+ *   <li>Instantiates the {@link FrontendDomainStack}</li>
+ *   <li>Synthesizes the CloudFormation template</li>
+ * </ul>
+ *
+ * <p>
+ * This app assumes that:
+ * <ul>
+ *   <li>The public Route 53 hosted zone already exists</li>
+ *   <li>A Cloudfront Distribution has already been provisioned</li>
+ *   <li>SSM Parameter already has CDN name and id</li>
+ * </ul>
  */
 public class FrontendDomainApp {
 

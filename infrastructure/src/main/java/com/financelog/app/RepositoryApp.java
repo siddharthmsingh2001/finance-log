@@ -119,12 +119,3 @@ public class RepositoryApp {
                 .build();
     }
 }
-
-/*
- * To push a Docker Image to an ECR
- * aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 654654630643.dkr.ecr.ap-south-1.amazonaws.com
- * docker pull docker.io/stratospheric/todo-app-v1:latest
- * docker tag stratospheric/todo-app-v1:latest 654654630643.dkr.ecr.ap-south-1.amazonaws.com/todo-app:latest
- * docker images | grep todo-app
- * docker push 654654630643.dkr.ecr.ap-south-1.amazonaws.com/todo-app:latest
- */
