@@ -1,4 +1,4 @@
-name: 04 - Deploy Network Infrastructure
+name: 04 - Deploy Service Infrastructure
 
 env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}

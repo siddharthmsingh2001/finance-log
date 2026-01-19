@@ -15,9 +15,6 @@ on:
         required: true
         default: dev
         options: [dev, staging, prod]
-      sslCertificateArnFrontend:
-        description: "ACM cert ARN (us-east-1)"
-        required: true
 
 jobs:
   deploy-frontend:
@@ -50,12 +47,11 @@ jobs:
         working-directory: infrastructure
         run: |
           npm install
-          npm run frontend:deploy -- \
+          npm run frontend-service:deploy -- \
             -c environmentName=${{ github.event.inputs.environmentName }} \
             -c region=us-east-1 \
             -c applicationName=finance-log \
-            -c accountId=${{ env.AWS_ACCOUNT_ID }} \
-            -c sslCertificateArnFrontend=${{ github.event.inputs.sslCertificateArnFrontend }}
+            -c accountId=${{ env.AWS_ACCOUNT_ID }} 
 
       - name: Get CloudFront ID from SSM
         id: fetch-params
