@@ -81,7 +81,7 @@ public class NetworkApp {
         NetworkConstruct.NetworkInputParameters inputParameters = new NetworkConstruct.NetworkInputParameters();
 
         // Optional SSL certificate for HTTPS support
-        String sslCertificateArn = (String) app.getNode().tryGetContext("sslCertificateArn");
+        String sslCertificateArn = (String) app.getNode().tryGetContext("sslCertificateArnBackend");
         if (sslCertificateArn != null && !sslCertificateArn.isBlank()) {
             inputParameters.withSslCertificateArn(sslCertificateArn);
         }
