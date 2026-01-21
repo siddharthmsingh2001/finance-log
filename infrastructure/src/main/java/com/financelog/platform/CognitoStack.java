@@ -231,7 +231,7 @@ public class CognitoStack extends Stack {
     private UserPoolClient createUserPoolClient(CognitoInputParameters inputParameters, UserPool userPool){
         return UserPoolClient.Builder.create(this, "UserPoolClient")
                 .userPool(userPool)
-                .userPoolClientName(inputParameters.applicationName+"user-pool-client")
+                .userPoolClientName(inputParameters.applicationName+"-user-pool-client")
                 .generateSecret(true) // Generate a secret for secure server-to-server communication.
                 .oAuth(OAuthSettings.builder() // Configure OAuth behavior.
                         .callbackUrls(Arrays.asList(
