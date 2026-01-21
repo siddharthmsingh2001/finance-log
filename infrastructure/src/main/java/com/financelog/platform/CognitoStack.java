@@ -2,14 +2,12 @@ package com.financelog.platform;
 
 import com.financelog.core.ApplicationEnvironment;
 import org.jetbrains.annotations.NotNull;
-import software.amazon.awscdk.Stack;
+import software.amazon.awscdk.*;
 import software.amazon.awscdk.services.cognito.UserPool;
 import software.amazon.awscdk.services.cognito.UserPoolClient;
 import java.util.Arrays;
 import java.util.Collections;
-import software.amazon.awscdk.Duration;
-import software.amazon.awscdk.Environment;
-import software.amazon.awscdk.StackProps;
+
 import software.amazon.awscdk.services.cognito.*;
 import software.amazon.awscdk.services.ssm.StringParameter;
 import software.constructs.Construct;
@@ -187,7 +185,7 @@ public class CognitoStack extends Stack {
      * @return configured {@link UserPool}
      */
     private UserPool createUserPool(CognitoInputParameters inputParameters){
-        return UserPool.Builder.create(this, "UserPool")
+        UserPool userPool = UserPool.Builder.create(this, "UserPool")
                 .userPoolName(inputParameters.applicationName+"-user-pool")
                 .selfSignUpEnabled(true) // Allow users to register themselves
                 .accountRecovery(AccountRecovery.EMAIL_ONLY) // Account recovery is limited to email-based flows
@@ -213,7 +211,8 @@ public class CognitoStack extends Stack {
                         .build()
                 )
                 .build();
-
+        userPool.applyRemovalPolicy(RemovalPolicy.DESTROY);
+        return userPool;
     }
 
     /**

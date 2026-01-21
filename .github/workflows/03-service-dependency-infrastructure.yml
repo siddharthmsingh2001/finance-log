@@ -1,4 +1,4 @@
-name: 03-service-dependency-infrastructure.yml
+name: 03 - service-dependency-infrastructure.yml
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
