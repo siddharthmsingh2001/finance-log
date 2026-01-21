@@ -1,0 +1,40 @@
+name: 03-service-dependency-infrastructure.yml
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      environmentName:
+        description: "Deployment environment (dev, staging, prod)"
+        type: choice
+        required: true
+        default: dev
+        options: [ dev, staging, prod ]
+
+jobs:
+  deploy-cognito-stack:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    name: Deploy the Cognito stack
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'maven'
+
+      - name: NPM install
+        working-directory: infrastructure
+        run: npm install
+
+      - name: Deploy Cognito stack
+        working-directory: infrastructure
+        run: npm run cognito:deploy -- -c environmentName=${{ github.event.inputs.environmentName }}
