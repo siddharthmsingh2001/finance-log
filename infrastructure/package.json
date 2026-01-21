@@ -36,6 +36,10 @@
     "frontend-domain:deploy": "cdk deploy --require-approval never --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.FrontendDomainApp\"",
     "frontend-domain:destroy": "cdk destroy --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.FrontendDomainApp\"",
 
+    "cognito:synth": "cdk synth --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.CognitoApp\"",
+    "cognito:deploy": "cdk deploy --require-approval never --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.CognitoApp\"",
+    "cognito:destroy": "cdk destroy --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.CognitoApp\"",
+
     "bootstrap": "cdk bootstrap --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.BootstrapApp\""
   },
   "devDependencies": {
