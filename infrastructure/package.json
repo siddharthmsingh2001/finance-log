@@ -40,6 +40,10 @@
     "cognito:deploy": "cdk deploy --require-approval never --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.CognitoApp\"",
     "cognito:destroy": "cdk destroy --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.CognitoApp\"",
 
+    "database:synth": "cdk synth --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.DatabaseApp\"",
+    "database:deploy": "cdk deploy --require-approval never --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.DatabaseApp\"",
+    "database:destroy": "cdk destroy --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.DatabaseApp\"",
+
     "bootstrap": "cdk bootstrap --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.BootstrapApp\""
   },
   "devDependencies": {
