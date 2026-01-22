@@ -6,12 +6,17 @@ import com.financelog.core.SpringProfile;
 import com.financelog.core.Validations;
 import com.financelog.network.NetworkOutputParameters;
 import com.financelog.network.NetworkParameterStore;
+import com.financelog.platform.*;
 import com.financelog.service.ServiceConstruct;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
+import software.amazon.awscdk.services.secretsmanager.ISecret;
+import software.amazon.awscdk.services.secretsmanager.Secret;
+import software.constructs.Construct;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -149,12 +154,6 @@ public class ServiceApp {
         );
 
         /*
-         * Creating a DockerImageSource with the help of the repositoryName and imageTag.
-         * The ServiceConstruct will use the ECR to pull the image and spin a Task.
-         */
-        ServiceConstruct.DockerImageSource imageSource = new ServiceConstruct.DockerImageSource(repositoryName, imageTag);
-
-        /*
          * Load network-level identifiers produced by the Network stack.
          *
          * These values are retrieved from SSM Parameter Store and include:
@@ -168,15 +167,17 @@ public class ServiceApp {
         NetworkOutputParameters networkOutputParameters = NetworkParameterStore.load(serviceStack, deploymentStage);
 
         /*
-         * Define the input configuration for the Service layer.
-         * * This includes:
-         * - The container image source (ECR repository and tag)
-         * - Runtime environment variables (specifically the active Spring profile)
-         * - Health check configurations to ensure zero-downtime deployments
+         * Load database outputs produced by the Database stack.
+         * These values are resolved from SSM Parameter Store.
          */
-        ServiceConstruct.ServiceInputParameters serviceInputParameters = new ServiceConstruct.ServiceInputParameters(
-                imageSource,
-                environmentVariables(springProfile.getName())).withHealthCheckIntervalSeconds(30);
+        DatabaseOutputParameters databaseOutputParameters = DatabaseParameterStore.load(serviceStack,applicationEnvironment);
+
+        /*
+         * Load Cognito outputs produced by the Cognito stack.
+         */
+        CognitoOutputParameters cognitoOutputParameters = CognitoParameterStore.load(serviceStack,applicationEnvironment);
+
+
 
         /*
          * Instantiate the ServiceConstruct, which acts as the architectural orchestrator.
@@ -191,7 +192,18 @@ public class ServiceApp {
                 "Service",
                 awsEnvironment,
                 applicationEnvironment,
-                serviceInputParameters,
+                new ServiceConstruct.ServiceInputParameters(
+                        new ServiceConstruct.DockerImageSource(repositoryName,imageTag),
+                        Arrays.asList(
+                                databaseOutputParameters.getSecurityGroupId()
+                        ),
+                        environmentVariables(
+                                serviceStack,
+                                springProfile.getName(),
+                                databaseOutputParameters,
+                                cognitoOutputParameters
+                        )
+                ),
                 networkOutputParameters
         );
 
@@ -210,10 +222,30 @@ public class ServiceApp {
     }
 
     static Map<String, String> environmentVariables(
-            String springProfile
+            Construct scope,
+            String springProfile,
+            DatabaseOutputParameters databaseOutputParameters,
+            CognitoOutputParameters cognitoOutputParameters
     ) {
         Map<String, String> vars = new HashMap<>();
+        // --- Spring Profile ---
         vars.put("SPRING_PROFILES_ACTIVE", springProfile);
+        // --- Database Configuration ---
+        vars.put(
+                "SPRING_DATASOURCE_URL",
+                String.format(
+                        "jdbc:mysql://%s:%s/%s",
+                        databaseOutputParameters.getEndpointAddress(),
+                        databaseOutputParameters.getEndpointPort(),
+                        databaseOutputParameters.getDatabaseName())
+        );
+        ISecret databaseSecret = Secret.fromSecretCompleteArn(scope,"DatabaseSecret", databaseOutputParameters.getSecretArn());
+        vars.put("SPRING_DATASOURCE_USERNAME", databaseSecret.secretValueFromJson("username").unsafeUnwrap());
+        vars.put("SPRING_DATABASE_PASSWORD", databaseSecret.secretValueFromJson("password").unsafeUnwrap());
+        // --- Cognito Configuration ---
+        vars.put("COGNITO_CLIENT_ID", cognitoOutputParameters.getUserPoolClientId());
+        vars.put("COGNITO_CLIENT_SECRET", cognitoOutputParameters.getUserPoolClientSecret());
+        vars.put("COGNITO_PROVIDER_URL", cognitoOutputParameters.getProviderUrl());
         return vars;
     }
 }
