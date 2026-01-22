@@ -130,7 +130,7 @@ public final class CognitoParameterStore {
      * </p>
      *
      * <pre>
-     * dev-cognito-userPoolId
+     * dev-finance-log-cognito-userPoolId
      * </pre>
      *
      * @param applicationEnvironment
