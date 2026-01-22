@@ -357,7 +357,8 @@ public class NetworkConstruct extends Construct{
                 InterfaceVpcEndpointAwsService.ECR,
                 InterfaceVpcEndpointAwsService.ECR_DOCKER,
                 InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS,
-                InterfaceVpcEndpointAwsService.STS
+                InterfaceVpcEndpointAwsService.STS,
+                InterfaceVpcEndpointAwsService.COGNITO_IDP
         );
 
         /*
