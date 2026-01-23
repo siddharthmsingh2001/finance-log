@@ -837,7 +837,7 @@ public class ServiceConstruct extends Construct{
          * Prevents all instances from being terminated at once.
          * </p>
          */
-        private boolean stickySessionsEnabled = false;
+        private boolean stickySessionsEnabled = true;
 
         /**
          * Enables or disables sticky sessions at the load balancer level.
