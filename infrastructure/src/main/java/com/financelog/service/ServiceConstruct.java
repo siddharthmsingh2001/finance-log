@@ -519,6 +519,7 @@ public class ServiceConstruct extends Construct{
                 .launchType("FARGATE")
                 .desiredCount(inputParams.desiredInstancesCount)
                 .taskDefinition(taskDefinition.getRef())
+                .healthCheckGracePeriodSeconds(120)
                 .deploymentConfiguration(
                         CfnService.DeploymentConfigurationProperty.builder()
                                 .maximumPercent(inputParams.maximumInstancesPercent)
@@ -702,7 +703,7 @@ public class ServiceConstruct extends Construct{
          * Shorter intervals detect failures faster but increase load.
          * </p>
          */
-        private int healthCheckIntervalSeconds = 10;
+        private int healthCheckIntervalSeconds = 30;
 
         /**
          * HTTP path that the load balancer calls to determine
@@ -713,7 +714,7 @@ public class ServiceConstruct extends Construct{
          * (2xx) when the application is healthy.
          * </p>
          */
-        private String healthCheckPath = "/";
+        private String healthCheckPath = "/actuator/health";
 
         /**
          * Port on which the application listens inside the container.
@@ -772,7 +773,7 @@ public class ServiceConstruct extends Construct{
          * Number of consecutive failed health checks required
          * before a target is marked as unhealthy.
          */
-        private int unhealthyThresholdCount = 8;
+        private int unhealthyThresholdCount = 3;
 
         /**
          * Retention period for application logs stored in CloudWatch Logs.
