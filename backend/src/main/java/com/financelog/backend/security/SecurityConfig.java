@@ -1,16 +1,15 @@
 package com.financelog.backend.security;
 
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 
 
-@Configurable
+@Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
@@ -21,13 +20,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(new CorsConfig()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/login", "error").permitAll()
+                        .requestMatchers("/actuator/health", "/login", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/oauth2/authorization/cognito")
                         .defaultSuccessUrl("/", true) //alternative to this is successHandler
-                        .clientRegistrationRepository(new InMemoryClientRegistrationRepository())
                 )
                 .securityContext(securityContext -> securityContext
                         .requireExplicitSave(false)
