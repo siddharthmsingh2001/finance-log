@@ -63,7 +63,7 @@ public class NetworkParameterStore {
                 getOptional(scope, stage, NetworkOutputs.PARAMETER_HTTPS_LISTENER),
                 get(scope, stage, NetworkOutputs.PARAMETER_LOADBALANCER_SECURITY_GROUP_ID),
                 get(scope, stage, NetworkOutputs.PARAMETER_ECS_CLUSTER_NAME),
-                getList(scope, stage, NetworkOutputs.PARAMETER_ISOLATED_SUBNETS, ParameterValueType.AWS_EC2_SUBNET_ID),
+                getList(scope, stage, NetworkOutputs.PARAMETER_PRIVATE_SUBNETS, ParameterValueType.AWS_EC2_SUBNET_ID),
                 getList(scope, stage, NetworkOutputs.PARAMETER_PUBLIC_SUBNETS, ParameterValueType.AWS_EC2_SUBNET_ID),
                 getList(scope, stage, NetworkOutputs.PARAMETER_AVAILABILITY_ZONES, ParameterValueType.AWS_EC2_AVAILABILITYZONE_NAME),
                 get(scope, stage, NetworkOutputs.PARAMETER_LOAD_BALANCER_ARN),

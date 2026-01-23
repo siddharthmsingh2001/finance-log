@@ -532,8 +532,8 @@ public class ServiceConstruct extends Construct{
                                         CfnService.AwsVpcConfigurationProperty.builder()
                                                 // .assignPublicIp("ENABLED") // necessary if task must call external API, pull from public registries
                                                 // .subnets(outputParams.getPublicSubnets())
-                                                .assignPublicIp("DISABLED") // when ECS is in the private subnet
-                                                .subnets(outputParams.getIsolatedSubnets())
+                                                .assignPublicIp("DISABLED") // when ECS is in the private subnet with outbound Egress via NAT
+                                                .subnets(outputParams.getPrivateSubnets())
                                                 .securityGroups(List.of(securityGroup.getAttrGroupId()))
                                                 .build()
                                 )

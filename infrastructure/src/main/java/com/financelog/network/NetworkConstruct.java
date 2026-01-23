@@ -232,13 +232,13 @@ public class NetworkConstruct extends Construct{
 
         // Isolated subnet for internal workloads(ECS Tasks, Databases) without internet access
         SubnetConfiguration isolatedSubnet = SubnetConfiguration.builder()
-                .subnetType(SubnetType.PRIVATE_ISOLATED)
-                .name("isolated-subnet") // dev-isolated-subnet
+                .subnetType(SubnetType.PRIVATE_WITH_EGRESS)
+                .name(prefixWithEnvironmentName("private-subnet")) // dev-isolated-subnet
                 .build();
 
         return Vpc.Builder.create(this, "Vpc")
                 .vpcName(prefixWithEnvironmentName("vpc"))
-                .natGateways(0)
+                .natGateways(1)
                 .maxAzs(2)
                 .subnetConfiguration(
                         Arrays.asList(publicSubnet,isolatedSubnet)
@@ -289,7 +289,7 @@ public class NetworkConstruct extends Construct{
                         .service(GatewayVpcEndpointAwsService.S3)
                         .subnets(List.of(
                                 SubnetSelection.builder()
-                                        .subnetType(SubnetType.PRIVATE_ISOLATED)
+                                        .subnetType(SubnetType.PRIVATE_WITH_EGRESS)
                                         .build()
                         ))
                         .build()
@@ -357,8 +357,7 @@ public class NetworkConstruct extends Construct{
                 InterfaceVpcEndpointAwsService.ECR,
                 InterfaceVpcEndpointAwsService.ECR_DOCKER,
                 InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS,
-                InterfaceVpcEndpointAwsService.STS,
-                InterfaceVpcEndpointAwsService.COGNITO_IDP
+                InterfaceVpcEndpointAwsService.STS
         );
 
         /*
@@ -372,7 +371,7 @@ public class NetworkConstruct extends Construct{
                             .service(service)
                             .subnets(
                                     SubnetSelection.builder()
-                                            .subnetType(SubnetType.PRIVATE_ISOLATED)
+                                            .subnetType(SubnetType.PRIVATE_WITH_EGRESS)
                                             .build()
                             )
                             .securityGroups(List.of(interfaceEndpointSecurityGroup))
@@ -591,7 +590,7 @@ public class NetworkConstruct extends Construct{
         putParameter("LoadBalancerCanonicalHostedZoneIdParameter", NetworkOutputs.PARAMETER_LOAD_BALANCER_HOSTED_ZONE_ID, this.loadBalancer.getLoadBalancerCanonicalHostedZoneId());
         putListParameter("AvailabilityZoneParameter", NetworkOutputs.PARAMETER_AVAILABILITY_ZONES, this.vpc.getAvailabilityZones());
         putListParameter("PublicSubnetIdsParameter", NetworkOutputs.PARAMETER_PUBLIC_SUBNETS, this.vpc.getPublicSubnets().stream().map(ISubnet::getSubnetId).toList());
-        putListParameter("IsolatedSubnetIdsParameter", NetworkOutputs.PARAMETER_ISOLATED_SUBNETS, this.vpc.getIsolatedSubnets().stream().map(ISubnet::getSubnetId).toList());
+        putListParameter("PrivateSubnetIdsParameter", NetworkOutputs.PARAMETER_PRIVATE_SUBNETS, this.vpc.getPrivateSubnets().stream().map(ISubnet::getSubnetId).toList());
     }
 
 

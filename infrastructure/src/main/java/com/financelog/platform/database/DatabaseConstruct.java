@@ -20,7 +20,7 @@ import java.util.Objects;
 
 
 /**
- * Provisions a MySQL RDS instance inside isolated subnets.
+ * Provisions a MySQL RDS instance inside private subnets.
  *
  * <p>
  * This construct is responsible only for infrastructure creation
@@ -59,6 +59,9 @@ public class DatabaseConstruct extends Construct {
 
     /**
      * Creates the security group for the database.
+     * Ingress rules are intentionally NOT defined here.
+     * Access is granted by consuming services (e.g. ECS)
+     * to enforce the least privilege and loose coupling.
      */
     private CfnSecurityGroup createSecurityGroup(NetworkOutputParameters outputParameters){
         return CfnSecurityGroup.Builder.create(this, "DatabaseSecurityGroup")
@@ -93,7 +96,7 @@ public class DatabaseConstruct extends Construct {
         return CfnDBSubnetGroup.Builder.create(this, "DatabaseSubnetGroup")
                 .dbSubnetGroupDescription("Subnet Group for the DB Instance")
                 .dbSubnetGroupName(applicationEnvironment.prefix("db-subnet-group"))
-                .subnetIds(outputParameters.getIsolatedSubnets())
+                .subnetIds(outputParameters.getPrivateSubnets())
                 .build();
     }
 
