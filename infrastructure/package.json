@@ -44,6 +44,10 @@
     "database:deploy": "cdk deploy --require-approval never --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.DatabaseApp\"",
     "database:destroy": "cdk destroy --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.DatabaseApp\"",
 
+    "bastion:synth": "cdk synth --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.BastionHostApp\"",
+    "bastion:deploy": "cdk deploy --require-approval never --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.BastionHostApp\"",
+    "bastion:destroy": "cdk destroy --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.BastionHostApp\"",
+
     "bootstrap": "cdk bootstrap --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.BootstrapApp\""
   },
   "devDependencies": {
