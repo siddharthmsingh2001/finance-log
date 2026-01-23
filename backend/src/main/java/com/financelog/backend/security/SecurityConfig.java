@@ -20,12 +20,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(new CorsConfig()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/login", "/error").permitAll()
+                        .requestMatchers("/actuator/health", "/login", "/error", "/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/oauth2/authorization/cognito")
-                        .defaultSuccessUrl("/", true) //alternative to this is successHandler
+                        .defaultSuccessUrl("/actuator/health", true) //alternative to this is successHandler
                 )
                 .securityContext(securityContext -> securityContext
                         .requireExplicitSave(false)
