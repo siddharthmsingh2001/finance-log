@@ -1,11 +1,10 @@
-package com.financelog.platform;
+package com.financelog.platform.database;
 
 import com.financelog.core.ApplicationEnvironment;
 import com.financelog.network.NetworkOutputParameters;
 import com.financelog.network.NetworkParameterStore;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.CfnDeletionPolicy;
-import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.ec2.CfnSecurityGroup;
 import software.amazon.awscdk.services.rds.CfnDBInstance;

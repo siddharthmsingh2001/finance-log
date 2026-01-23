@@ -1,9 +1,7 @@
-package com.financelog.platform;
+package com.financelog.platform.cognito;
 
 
 import com.financelog.core.ApplicationEnvironment;
-import com.financelog.core.DeploymentStage;
-import software.amazon.awscdk.services.appconfig.Application;
 import software.amazon.awscdk.services.ssm.StringParameter;
 import software.constructs.Construct;
 

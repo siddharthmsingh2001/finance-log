@@ -4,7 +4,7 @@ package com.financelog.app;
 import com.financelog.core.ApplicationEnvironment;
 import com.financelog.core.DeploymentStage;
 import com.financelog.core.Validations;
-import com.financelog.platform.CognitoStack;
+import com.financelog.platform.cognito.CognitoStack;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 

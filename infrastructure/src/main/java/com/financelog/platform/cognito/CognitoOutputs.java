@@ -1,4 +1,4 @@
-package com.financelog.platform;
+package com.financelog.platform.cognito;
 
 /**
  * Defines the canonical set of SSM parameter keys

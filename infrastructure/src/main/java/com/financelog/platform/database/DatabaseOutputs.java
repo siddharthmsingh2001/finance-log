@@ -1,4 +1,4 @@
-package com.financelog.platform;
+package com.financelog.platform.database;
 
 
 /**

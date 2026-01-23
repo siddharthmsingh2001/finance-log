@@ -1,4 +1,4 @@
-package com.financelog.platform;
+package com.financelog.platform.cognito;
 
 import com.financelog.core.ApplicationEnvironment;
 import org.jetbrains.annotations.NotNull;
