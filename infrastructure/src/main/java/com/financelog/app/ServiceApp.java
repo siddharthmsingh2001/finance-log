@@ -244,7 +244,7 @@ public class ServiceApp {
         );
         ISecret databaseSecret = Secret.fromSecretCompleteArn(scope,"DatabaseSecret", databaseOutputParameters.getSecretArn());
         vars.put("SPRING_DATASOURCE_USERNAME", databaseSecret.secretValueFromJson("username").unsafeUnwrap());
-        vars.put("SPRING_DATABASE_PASSWORD", databaseSecret.secretValueFromJson("password").unsafeUnwrap());
+        vars.put("SPRING_DATASOURCE_PASSWORD", databaseSecret.secretValueFromJson("password").unsafeUnwrap());
         // --- Cognito Configuration ---
         vars.put("COGNITO_CLIENT_ID", cognitoOutputParameters.getUserPoolClientId());
         vars.put("COGNITO_CLIENT_SECRET", cognitoOutputParameters.getUserPoolClientSecret());
