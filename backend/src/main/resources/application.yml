@@ -35,6 +35,8 @@ spring:
 server:
   port: 8080
   forward-headers-strategy: framework
+  servlet:
+    context-path: "/api"
 
 management:
   info:
@@ -52,3 +54,17 @@ management:
 info:
   application:
     name: finance-log-backend
+
+api:
+  user:
+    version: "v1"
+
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE
+    com:
+      financelog:
+        backend: TRACE
+    root: WARN
