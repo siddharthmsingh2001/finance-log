@@ -34,7 +34,7 @@ public class SecurityBeans {
     @Bean
     AuthenticationSuccessHandler authenticationSuccessHandler(){
         return (request, response, authentication) -> {
-            response.sendRedirect("https://localhost:5137/");
+            response.sendRedirect("https://app.finance-log.com/");
         };
     }
 
