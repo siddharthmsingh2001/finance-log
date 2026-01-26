@@ -235,8 +235,8 @@ public class CognitoStack extends Stack {
                 .generateSecret(true) // Generate a secret for secure server-to-server communication.
                 .oAuth(OAuthSettings.builder() // Configure OAuth behavior.
                         .callbackUrls(Arrays.asList(
-                                String.format("%s/login/oauth2/code/cognito", inputParameters.apiUrl),
-                                "http://localhost:8080/login/oauth2/code/cognito"
+                                String.format("%s/api/login/oauth2/code/cognito", inputParameters.apiUrl),
+                                "http://localhost:8080/api/login/oauth2/code/cognito"
                         ))
                         .logoutUrls(Arrays.asList(
                                 inputParameters.apiUrl,
