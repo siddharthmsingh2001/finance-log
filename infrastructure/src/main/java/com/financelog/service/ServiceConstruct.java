@@ -714,7 +714,7 @@ public class ServiceConstruct extends Construct{
          * (2xx) when the application is healthy.
          * </p>
          */
-        private String healthCheckPath = "/actuator/health";
+        private String healthCheckPath = "/api/actuator/health";
 
         /**
          * Port on which the application listens inside the container.
