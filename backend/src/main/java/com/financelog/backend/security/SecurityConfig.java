@@ -2,30 +2,47 @@ package com.financelog.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final AuthenticationSuccessHandler authSuccessHandler;
+    private final AuthenticationEntryPoint authEntryPoint;
+
+    public SecurityConfig(
+            AuthenticationSuccessHandler authSuccessHandler,
+            AuthenticationEntryPoint authEntryPoint
+    ){
+        this.authSuccessHandler = authSuccessHandler;
+        this.authEntryPoint = authEntryPoint;
+    }
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
                 .securityMatcher("/**")
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(new CorsConfig()))
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/login", "/error", "/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/oauth2/authorization/cognito")
-                        .defaultSuccessUrl("/actuator/health", true) //alternative to this is successHandler
+                        .successHandler(authSuccessHandler)
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authEntryPoint)
                 )
                 .securityContext(securityContext -> securityContext
                         .requireExplicitSave(false)
