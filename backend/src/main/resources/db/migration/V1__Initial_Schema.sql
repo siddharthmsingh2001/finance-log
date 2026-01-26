@@ -80,12 +80,15 @@ CREATE TABLE IF NOT EXISTS tags (
     id BINARY(16) PRIMARY KEY,
     user_id BINARY(16) NOT NULL,
     name VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS transaction_tags (
     transaction_id BINARY(16) NOT NULL,
     tag_id BINARY(16) NOT NULL,
+
     PRIMARY KEY (transaction_id, tag_id),
     FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
