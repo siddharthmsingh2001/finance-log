@@ -29,7 +29,11 @@ public class CognitoApp {
 
         // Base url for the Api
         String apiUrl = (String) app.getNode().tryGetContext("apiUrl");
-        Validations.requireNonEmpty(apiUrl, "context variable 'applicationUrl' must not be null");
+        Validations.requireNonEmpty(apiUrl, "context variable 'apiUrl' must not be null");
+
+        // Base url for the App
+        String appUrl = (String) app.getNode().tryGetContext("appUrl");
+        Validations.requireNonEmpty(appUrl, "context variable 'appUrl' must not be null");
 
         // Resolve AWS region for deployment
         String region = (String) app.getNode().tryGetContext("region");
@@ -50,7 +54,7 @@ public class CognitoApp {
                 "CognitoStack",
                 awsEnvironment,
                 applicationEnvironment,
-                new CognitoStack.CognitoInputParameters(applicationName, apiUrl, loginPageDomainPrefix)
+                new CognitoStack.CognitoInputParameters(applicationName, apiUrl, appUrl, loginPageDomainPrefix)
         );
 
         app.synth();
