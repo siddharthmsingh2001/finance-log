@@ -239,8 +239,8 @@ public class CognitoStack extends Stack {
                                 "http://localhost:8080/api/login/oauth2/code/cognito"
                         ))
                         .logoutUrls(Arrays.asList(
-                                inputParameters.apiUrl,
-                                "http://localhost:8080"
+                                inputParameters.appUrl,
+                                "http://localhost:5173"
                         ))
                         .flows(OAuthFlows.builder()
                                 .authorizationCodeGrant(true)
@@ -345,11 +345,13 @@ public class CognitoStack extends Stack {
     public static class CognitoInputParameters{
         private final String applicationName;
         private final String apiUrl;
+        private final String appUrl;
         private final String loginPageDomainPrefix;
 
-        public CognitoInputParameters(String applicationName, String apiUrl, String loginPageDomainPrefix) {
+        public CognitoInputParameters(String applicationName, String apiUrl, String appUrl, String loginPageDomainPrefix) {
             this.applicationName = applicationName;
             this.apiUrl = apiUrl;
+            this.appUrl = appUrl;
             this.loginPageDomainPrefix = loginPageDomainPrefix;
         }
     }
