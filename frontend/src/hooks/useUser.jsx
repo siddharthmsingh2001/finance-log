@@ -1,24 +1,25 @@
 import {useContext, useEffect, useState} from "react";
 import {AppContext} from "../context/AppContext.jsx";
 import axiosConfig from "../util/axiosConfig.jsx";
+import {API_ENDPOINTS} from "../util/apiEndpoints.js";
 
 export const useUser = () => {
     const {user, setUser, clearUser} = useContext(AppContext);
-    const [isLoading, setIsLoading] = useState(true); // Start as true!
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchUserInfo = async () => {
+        const loadUser = async () => {
             try {
-                const response = await axiosConfig.get("/v1/user-info");
+                const response = await axiosConfig.get(API_ENDPOINTS.USER_INFO);
                 setUser(response.data);
-            } catch (error) {
+            } catch {
                 clearUser();
             } finally {
-                setIsLoading(false); // Stop loading no matter what
+                setIsLoading(false);
             }
         };
-        fetchUserInfo();
+        loadUser();
     }, []);
 
-    return { user, isLoading }; // Return both!
+    return { user, isLoading };
 }

@@ -1,8 +1,9 @@
 import axios from "axios";
+import {BASE_URL, API_ENDPOINTS} from "./apiEndpoints.js"
 
 const axiosConfig = axios.create({
-    baseURL: "https://api.finance-log.com/api/", // Your Spring Boot URL
-    withCredentials: true,           // MANDATORY: Sends the Session Cookie to the Backend
+    baseURL: BASE_URL,
+    withCredentials: true,
     headers: {
         "Content-Type": "application/json",
         Accept: "application/json"
@@ -17,7 +18,7 @@ axiosConfig.interceptors.response.use(
     (error) => {
         if (error.response && error.response.status === 401) {
             // If the session expired in Redis/Spring, send them to login
-            window.location.href = "https://api.finance-log.com/api/oauth2/authorization/cognito";
+            window.location.href = BASE_URL+API_ENDPOINTS.AUTH;
         }
         return Promise.reject(error);
     }

@@ -1,23 +1,8 @@
-export const BASE_URL = "http://api.finance-log:8080/";
+export const BASE_URL = "https://api.finance-log.com/api";
 
 export const API_ENDPOINTS = {
-    LOGIN: "/login",
-    REGISTER: "/register",
-    GET_USER_INFO: "/profile",
-    GET_ALL_CATEGORIES: "/categories",
-    ADD_CATEGORY: "/categories",
-    UPDATE_CATEGORY: (categoryId) => `/categories/${categoryId}`,
-    GET_ALL_INCOMES: "/incomes",
-    CATEGORY_BY_TYPE: (type) => `/categories/${type}`,
-    ADD_INCOME: "/incomes",
-    DELETE_INCOME: (incomeId) => `/incomes/${incomeId}`,
-    INCOME_EXCEL_DOWNLOAD: "excel/download/income",
-    EMAIL_INCOME: "/email/income-excel",
-    GET_ALL_EXPENSE: "/expenses",
-    ADD_EXPENSE: "/expenses",
-    DELETE_EXPENSE: (expenseId) => `/expenses/${expenseId}`,
-    EXPENSE_EXCEL_DOWNLOAD: "excel/download/expense",
-    EMAIL_EXPENSE: "/email/expense-excel",
-    APPLY_FILTERS: "/filter",
-    DASHBOARD_DATA: "/dashboard",
-}
+    USER_INFO: "/v1/user-info",
+    DASHBOARD: "/v1/dashboard",
+    AUTH: "/oauth2/authorization/cognito",
+    LOGOUT: "/logout"
+};

@@ -1,5 +1,5 @@
 import {BrowserRouter, Navigate, Routes, Route} from "react-router-dom";
-import Home from "./pages/Home.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 import Income from "./pages/Income.jsx";
 import Expense from "./pages/Expense.jsx";
 import Category from "./pages/Category.jsx";
@@ -16,7 +16,7 @@ const App = () => {
                 <Routes>
                     <Route path="/" element={<AuthGuard />} />
                     <Route path="/home" element={<LandingPage />} />
-                    <Route path="/dashboard" element={<Home />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/income" element={<Income />} />
                     <Route path="/expense" element={<Expense />} />
                     <Route path="/category" element={<Category />} />

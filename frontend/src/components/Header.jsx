@@ -19,7 +19,7 @@ const Header = () => {
                     {/* Logo */}
                     <div className="flex items-center gap-2">
                         <img src={assets.logo} alt="logo" className="h-10 w-10" />
-                        <span className="text-lg font-bold text-black truncate">Money Manager</span>
+                        <span className="text-lg font-bold text-black truncate">Finance Log</span>
                     </div>
 
                     {/* Desktop Navigation */}
@@ -34,7 +34,7 @@ const Header = () => {
                     {/* Action Buttons & Hamburger Menu */}
                     <div className="flex items-center space-x-4">
                         <div className="hidden sm:flex items-center space-x-4">
-                            <a href="http://api.finance-log.com/oauth2/authorization/cognito" className="...">
+                            <a href="http://api.finance-log.com/api/oauth2/authorization/cognito" className="...">
                                 Login
                             </a>
                             <Link
