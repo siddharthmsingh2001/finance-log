@@ -72,6 +72,6 @@ public class SecurityBeans {
                     .build()
                     .toUriString();
             response.sendRedirect(redirectUrl);
-        }
+        };
     }
 }
