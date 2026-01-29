@@ -243,12 +243,15 @@ public class ServiceApp {
                         databaseOutputParameters.getDatabaseName())
         );
         ISecret databaseSecret = Secret.fromSecretCompleteArn(scope,"DatabaseSecret", databaseOutputParameters.getSecretArn());
+        // --- Datasource Configuration ---
         vars.put("SPRING_DATASOURCE_USERNAME", databaseSecret.secretValueFromJson("username").unsafeUnwrap());
         vars.put("SPRING_DATASOURCE_PASSWORD", databaseSecret.secretValueFromJson("password").unsafeUnwrap());
         // --- Cognito Configuration ---
         vars.put("COGNITO_CLIENT_ID", cognitoOutputParameters.getUserPoolClientId());
         vars.put("COGNITO_CLIENT_SECRET", cognitoOutputParameters.getUserPoolClientSecret());
         vars.put("COGNITO_PROVIDER_URL", cognitoOutputParameters.getProviderUrl());
+        // --- App Configuration ---
+        vars.put("APP_URL", "https://app.finance-log.com");
         return vars;
     }
 }

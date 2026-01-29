@@ -7,9 +7,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 
 @Configuration
@@ -18,13 +20,16 @@ public class SecurityConfig {
 
     private final AuthenticationSuccessHandler authSuccessHandler;
     private final AuthenticationEntryPoint authEntryPoint;
+    private final LogoutSuccessHandler logoutSuccessHandler;
 
     public SecurityConfig(
             AuthenticationSuccessHandler authSuccessHandler,
-            AuthenticationEntryPoint authEntryPoint
+            AuthenticationEntryPoint authEntryPoint,
+            LogoutSuccessHandler logoutSuccessHandler
     ){
         this.authSuccessHandler = authSuccessHandler;
         this.authEntryPoint = authEntryPoint;
+        this.logoutSuccessHandler = logoutSuccessHandler;
     }
 
     @Bean
@@ -34,12 +39,25 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/login", "/error", "/oauth2/**").permitAll()
+                        .requestMatchers(
+                                "/actuator/health",
+                                "/login",
+                                "/logout",
+                                "/error",
+                                "/oauth2/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/oauth2/authorization/cognito")
                         .successHandler(authSuccessHandler)
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler(logoutSuccessHandler)
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authEntryPoint)
@@ -52,7 +70,6 @@ public class SecurityConfig {
                 );
         return http.build();
     }
-
 }
 /*
  * Spring Security learns about OAuth endpoints from spring.security.oauth2.client.provider.cognito.issuer-uri

@@ -56,8 +56,13 @@ info:
     name: finance-log-backend
 
 api:
+  app:
+    url: ${APP_URL}
   user:
     version: "v1"
+  auth:
+    cognito:
+      logoutUrl: "https://finance-log.auth.ap-south-1.amazoncognito.com/logout"
 
 logging:
   level:
