@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Wallet, WalletCards, Coins } from "lucide-react";
 import {addThousandsSeparator} from "../util/util.js";
-import axiosConfig from "../util/axiosConfig.jsx";
+import axiosPrivate from "../util/axiosPrivate";
 import {API_ENDPOINTS} from "../util/apiEndpoints.js";
 import { useUser } from "../hooks/useUser";
 import DashboardLayout from "../components/DashboardLayout.jsx";
@@ -30,7 +30,7 @@ const Dashboard = () =>{
         const fetchDashboard = async ()=>{
             setLoading(true);
             try{
-                const res = await axiosConfig.get(API_ENDPOINTS.DASHBOARD);
+                const res = await axiosPrivate.get(API_ENDPOINTS.DASHBOARD);
                 setDashboard(res);
             } catch (err){
                 console.error(err);

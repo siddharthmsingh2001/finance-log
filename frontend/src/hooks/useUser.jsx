@@ -1,6 +1,6 @@
 import {useContext, useEffect, useState} from "react";
 import {AppContext} from "../context/AppContext.jsx";
-import axiosConfig from "../util/axiosConfig.jsx";
+import axiosPublic from "../util/axiosPublic";
 import {API_ENDPOINTS} from "../util/apiEndpoints.js";
 
 export const useUser = () => {
@@ -10,7 +10,7 @@ export const useUser = () => {
     useEffect(() => {
         const loadUser = async () => {
             try {
-                const response = await axiosConfig.get(API_ENDPOINTS.USER_INFO);
+                const response = await axiosPublic.get(API_ENDPOINTS.USER_INFO);
                 setUser(response.data);
             } catch {
                 clearUser();
