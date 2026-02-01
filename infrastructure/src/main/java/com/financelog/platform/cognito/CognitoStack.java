@@ -7,6 +7,7 @@ import software.amazon.awscdk.services.cognito.UserPool;
 import software.amazon.awscdk.services.cognito.UserPoolClient;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import software.amazon.awscdk.services.cognito.*;
 import software.amazon.awscdk.services.ssm.StringParameter;
@@ -92,23 +93,6 @@ public class CognitoStack extends Stack {
     private final UserPoolClient userPoolClient;
 
     /**
-     * Cognito-hosted domain that provides login, signup,
-     * password reset, and logout pages.
-     */
-    private final UserPoolDomain userPoolDomain;
-
-    /**
-     * Fully qualified logout URL for the Cognito Hosted UI.
-     *
-     * <p>
-     * Backend applications redirect users to this URL
-     * during logout to ensure both local sessions and
-     * Cognito sessions are terminated.
-     * </p>
-     */
-    private final String logoutUrl;
-
-    /**
      * Creates a new Cognito infrastructure stack.
      *
      * @param scope
@@ -146,18 +130,9 @@ public class CognitoStack extends Stack {
 
         this.applicationEnvironment = applicationEnvironment;
 
-        /*
-         * Construct the logout URL for Cognito Hosted UI.
-         *
-         * This URL is later used by the backend to redirect users
-         * during logout, ensuring Cognito clears its session.
-         */
-        this.logoutUrl = String.format("https://%s.auth.%s.amazoncognito.com/logout", inputParameters.loginPageDomainPrefix, awsEnvironment.getRegion());
-
         // Create the core Cognito resources.
         this.userPool = createUserPool(inputParameters);
         this.userPoolClient = createUserPoolClient(inputParameters, userPool);
-        this.userPoolDomain = createUserPoolDomain(inputParameters, userPool);
 
         // Export identifiers required by other stacks.
         createOutputParameters();
@@ -191,7 +166,7 @@ public class CognitoStack extends Stack {
                 .accountRecovery(AccountRecovery.EMAIL_ONLY) // Account recovery is limited to email-based flows
                 .autoVerify(AutoVerifiedAttrs.builder().email(true).build()) // Automatically verify email addresses during signup.
                 .signInAliases(SignInAliases.builder().email(true).build())  // Use email as the primary sign-in identifier
-                .signInCaseSensitive(true)
+                .signInCaseSensitive(false)
                 .email(UserPoolEmail.withCognito()) // Use Cognito-managed email delivery.
                 .standardAttributes( StandardAttributes.builder()
                         // Define required and optional user attributes.
@@ -232,54 +207,19 @@ public class CognitoStack extends Stack {
         return UserPoolClient.Builder.create(this, "UserPoolClient")
                 .userPool(userPool)
                 .userPoolClientName(inputParameters.applicationName+"-user-pool-client")
+                .authFlows(AuthFlow.builder()
+                        .userPassword(true)
+                        .build()
+                )
                 .generateSecret(true) // Generate a secret for secure server-to-server communication.
-                .oAuth(OAuthSettings.builder() // Configure OAuth behavior.
-                        .callbackUrls(Arrays.asList(
-                                String.format("%s/api/login/oauth2/code/cognito", inputParameters.apiUrl),
-                                "http://localhost:8080/api/login/oauth2/code/cognito"
-                        ))
-                        .logoutUrls(Arrays.asList(
-                                inputParameters.appUrl,
-                                "http://localhost:5173"
-                        ))
-                        .flows(OAuthFlows.builder()
-                                .authorizationCodeGrant(true)
-                                .build()
-                        )
-                        .scopes(Arrays.asList(
-                                OAuthScope.EMAIL, OAuthScope.OPENID, OAuthScope.PROFILE
-                        ))
+                .oAuth(OAuthSettings.builder()
+                        .flows(OAuthFlows.builder().build())
+                        .scopes(List.of())
                         .build()
                 )
                 // Restrict identity providers to Cognito itself.
                 .supportedIdentityProviders(
                         Collections.singletonList(UserPoolClientIdentityProvider.COGNITO)
-                )
-                .build();
-    }
-
-    /**
-     * Creates the Cognito Hosted UI domain.
-     *
-     * <p>
-     * This domain hosts login, signup, and logout pages
-     * managed by Cognito.
-     * </p>
-     *
-     * @param inputParameters
-     *   Configuration containing the domain prefix.
-     *
-     * @param userPool
-     *   The user pool to associate with the domain.
-     *
-     * @return configured {@link UserPoolDomain}
-     */
-    private UserPoolDomain createUserPoolDomain(CognitoInputParameters inputParameters, UserPool userPool){
-        return UserPoolDomain.Builder.create(this, "UserPoolDomain")
-                .userPool(userPool)
-                .cognitoDomain(CognitoDomainOptions.builder()
-                        .domainPrefix(inputParameters.loginPageDomainPrefix)
-                        .build()
                 )
                 .build();
     }
@@ -297,8 +237,6 @@ public class CognitoStack extends Stack {
     private void createOutputParameters(){
         putParameter("UserPoolId", CognitoOutputs.PARAMETER_USER_POOL_ID, userPool.getUserPoolId());
         putParameter("UserPoolClientId", CognitoOutputs.PARAMETER_USER_POOL_CLIENT_ID, userPoolClient.getUserPoolClientId());
-        putParameter("LogoutUrl", CognitoOutputs.PARAMETER_LOGOUT_URL, logoutUrl);
-        putParameter("ProviderUrl", CognitoOutputs.PARAMETER_PROVIDER_URL, userPool.getUserPoolProviderUrl());
         putParameter("UserPoolClientSecret", CognitoOutputs.PARAMETER_USER_POOL_CLIENT_SECRET,userPoolClient.getUserPoolClientSecret().unsafeUnwrap());
     }
 
@@ -344,15 +282,9 @@ public class CognitoStack extends Stack {
      */
     public static class CognitoInputParameters{
         private final String applicationName;
-        private final String apiUrl;
-        private final String appUrl;
-        private final String loginPageDomainPrefix;
 
-        public CognitoInputParameters(String applicationName, String apiUrl, String appUrl, String loginPageDomainPrefix) {
+        public CognitoInputParameters(String applicationName) {
             this.applicationName = applicationName;
-            this.apiUrl = apiUrl;
-            this.appUrl = appUrl;
-            this.loginPageDomainPrefix = loginPageDomainPrefix;
         }
     }
 

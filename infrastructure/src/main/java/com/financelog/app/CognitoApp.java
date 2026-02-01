@@ -54,7 +54,7 @@ public class CognitoApp {
                 "CognitoStack",
                 awsEnvironment,
                 applicationEnvironment,
-                new CognitoStack.CognitoInputParameters(applicationName, apiUrl, appUrl, loginPageDomainPrefix)
+                new CognitoStack.CognitoInputParameters(applicationName)
         );
 
         app.synth();
