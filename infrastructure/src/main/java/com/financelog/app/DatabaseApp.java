@@ -3,7 +3,7 @@ package com.financelog.app;
 import com.financelog.core.ApplicationEnvironment;
 import com.financelog.core.DeploymentStage;
 import com.financelog.core.Validations;
-import com.financelog.platform.database.DatabaseConstruct;
+import com.financelog.platform.storage.DatabaseConstruct;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.Stack;

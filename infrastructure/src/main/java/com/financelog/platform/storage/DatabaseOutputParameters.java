@@ -1,4 +1,4 @@
-package com.financelog.platform.database;
+package com.financelog.platform.storage;
 
 /**
  * Immutable value object representing an existing MySQL database.

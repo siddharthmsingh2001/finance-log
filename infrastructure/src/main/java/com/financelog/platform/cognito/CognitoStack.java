@@ -212,11 +212,6 @@ public class CognitoStack extends Stack {
                         .build()
                 )
                 .generateSecret(true) // Generate a secret for secure server-to-server communication.
-                .oAuth(OAuthSettings.builder()
-                        .flows(OAuthFlows.builder().build())
-                        .scopes(List.of())
-                        .build()
-                )
                 // Restrict identity providers to Cognito itself.
                 .supportedIdentityProviders(
                         Collections.singletonList(UserPoolClientIdentityProvider.COGNITO)

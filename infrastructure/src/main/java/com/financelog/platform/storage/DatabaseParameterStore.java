@@ -1,4 +1,4 @@
-package com.financelog.platform.database;
+package com.financelog.platform.storage;
 
 import com.financelog.core.ApplicationEnvironment;
 import software.amazon.awscdk.services.ssm.StringParameter;

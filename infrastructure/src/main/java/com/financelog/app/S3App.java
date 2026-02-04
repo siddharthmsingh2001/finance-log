@@ -3,13 +3,13 @@ package com.financelog.app;
 import com.financelog.core.ApplicationEnvironment;
 import com.financelog.core.DeploymentStage;
 import com.financelog.core.Validations;
-import com.financelog.platform.storage.BastionConstruct;
+import com.financelog.platform.storage.S3Construct;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 
-public class BastionHostApp {
+public class S3App {
 
     public static void main(String[] args) {
 
@@ -32,39 +32,27 @@ public class BastionHostApp {
         String region = (String) app.getNode().tryGetContext("region");
         Validations.requireNonEmpty(region, "context variable 'region' must not be null");
 
-        // key naming convention: {deploymentStage}-finance-log-bastion-host
-        // Resolve BastionHost private SSH keyName
-        String keyName = (String) app.getNode().tryGetContext("keyName");
-        Validations.requireNonEmpty(region, "context variable 'keyName' must not be null");
-
-        // Resolve local device public IP address to connect to the BastionHost
-        String localPublicIp = (String) app.getNode().tryGetContext("localPublicIp");
-        Validations.requireNonEmpty(region, "context variable 'localPublicIp' must not be null");
-
         // AWS environment (account + region)
         Environment awsEnvironment = makeEnv(accountId, region);
 
         // Encapsulates the deployment with application name used for naming conventions
         ApplicationEnvironment applicationEnvironment = new ApplicationEnvironment(applicationName,deploymentStage);
 
-        Stack stack = new Stack(app, "BastionHostStack",
-                StackProps.builder()
-                        .stackName(applicationEnvironment.prefix("bastion-stack"))
-                        .env(awsEnvironment)
-                        .build()
+        // Creating out stack
+        Stack s3Stack = new Stack(app, "S3Stack", StackProps.builder()
+                .stackName(applicationEnvironment.prefix("s3-stack"))
+                .env(awsEnvironment)
+                .build()
         );
 
-        new BastionConstruct(
-                stack,
-                "BastionHost",
-                applicationEnvironment,
-                new BastionConstruct.BastionInputParameters(
-                        keyName,
-                        localPublicIp
-                )
+        new S3Construct(
+                s3Stack,
+                "S3",
+                applicationEnvironment
         );
 
         app.synth();
+
     }
 
     /**
@@ -77,4 +65,5 @@ public class BastionHostApp {
                 .region(region)
                 .build();
     }
+
 }

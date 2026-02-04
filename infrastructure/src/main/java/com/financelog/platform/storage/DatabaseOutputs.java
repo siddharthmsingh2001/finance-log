@@ -1,8 +1,8 @@
-package com.financelog.platform.database;
+package com.financelog.platform.storage;
 
 
 /**
- * Defines the SSM parameter keys exported by the Postgres database stack.
+ * Defines the SSM parameter keys exported by the MySQL database stack.
  *
  * <p>
  * These keys are written by {@link DatabaseConstruct}

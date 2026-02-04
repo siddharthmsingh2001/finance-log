@@ -8,19 +8,24 @@ import com.financelog.network.NetworkOutputParameters;
 import com.financelog.network.NetworkParameterStore;
 import com.financelog.platform.cognito.CognitoOutputParameters;
 import com.financelog.platform.cognito.CognitoParameterStore;
-import com.financelog.platform.database.DatabaseOutputParameters;
-import com.financelog.platform.database.DatabaseParameterStore;
+import com.financelog.platform.storage.DatabaseOutputParameters;
+import com.financelog.platform.storage.DatabaseParameterStore;
+import com.financelog.platform.storage.S3OutputParameters;
+import com.financelog.platform.storage.S3ParameterStore;
 import com.financelog.service.ServiceConstruct;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
+import software.amazon.awscdk.services.iam.Effect;
+import software.amazon.awscdk.services.iam.PolicyStatement;
 import software.amazon.awscdk.services.secretsmanager.ISecret;
 import software.amazon.awscdk.services.secretsmanager.Secret;
 import software.constructs.Construct;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -180,33 +185,62 @@ public class ServiceApp {
          */
         CognitoOutputParameters cognitoOutputParameters = CognitoParameterStore.load(serviceStack,applicationEnvironment);
 
-
-
         /*
-         * Instantiate the ServiceConstruct, which acts as the architectural orchestrator.
-         * * It takes the existing Network foundation and "plugs in" the application service.
-         * Responsibilities include:
-         * - Defining the ECS Fargate Task Definition and Service
-         * - Configuring Load Balancer listeners and Target Groups
-         * - Setting up CloudWatch logging and IAM execution roles
+         * Load S3 outputs produced by the S3 stack.
          */
+        S3OutputParameters s3OutputParameters = S3ParameterStore.load(serviceStack,applicationEnvironment);
+
+        // Cognito Policy Statement
+        PolicyStatement cognitoPolicy = PolicyStatement.Builder.create()
+                .effect(Effect.ALLOW)
+                .resources(List.of(String.format("arn:aws:cognito-idp:%s:%s:userpool/%s",
+                        region,
+                        accountId,
+                        cognitoOutputParameters.getUserPoolId())))
+                .actions(List.of(
+                        "cognito-idp:InitiateAuth",
+                        "cognito-idp:SignUp",
+                        "cognito-idp:ConfirmSignUp",
+                        "cognito-idp:GetUser",
+                        "cognito-idp:GlobalSignOut"
+                ))
+                .build();
+
+        // S3 Policy Statement
+        PolicyStatement s3Policy = PolicyStatement.Builder.create()
+                .effect(Effect.ALLOW)
+                .resources(List.of(
+                        String.format("arn:aws:s3:::%s", s3OutputParameters.getS3BucketName()),
+                        String.format("arn:aws:s3:::%s/*", s3OutputParameters.getS3BucketName())
+                ))
+                .actions(List.of(
+                        "s3:PutObject",
+                        "s3:GetObject",
+                        "s3:DeleteObject"
+                ))
+                .build();
+
+        // Defining the ServiceInputParameters
+        ServiceConstruct.ServiceInputParameters serviceInputParameters = new ServiceConstruct.ServiceInputParameters(
+                new ServiceConstruct.DockerImageSource(repositoryName, imageTag),
+                Arrays.asList(databaseOutputParameters.getSecurityGroupId()),
+                environmentVariables(
+                        serviceStack,
+                        springProfile.getName(),
+                        databaseOutputParameters,
+                        cognitoOutputParameters,
+                        s3OutputParameters
+                )
+        )
+                .withTaskRolePolicyStatements(List.of(cognitoPolicy));
+
+        // Defining the Construct
         ServiceConstruct serviceConstruct = new ServiceConstruct(
                 serviceStack,
                 "Service",
                 awsEnvironment,
                 applicationEnvironment,
-                new ServiceConstruct.ServiceInputParameters(
-                        new ServiceConstruct.DockerImageSource(repositoryName,imageTag),
-                        Arrays.asList(
-                                databaseOutputParameters.getSecurityGroupId()
-                        ),
-                        environmentVariables(
-                                serviceStack,
-                                springProfile.getName(),
-                                databaseOutputParameters,
-                                cognitoOutputParameters
-                        )
-                ),
+                serviceInputParameters,
                 networkOutputParameters
         );
 
@@ -228,7 +262,8 @@ public class ServiceApp {
             Construct scope,
             String springProfile,
             DatabaseOutputParameters databaseOutputParameters,
-            CognitoOutputParameters cognitoOutputParameters
+            CognitoOutputParameters cognitoOutputParameters,
+            S3OutputParameters s3OutputParameters
     ) {
         Map<String, String> vars = new HashMap<>();
         // --- Spring Profile ---
@@ -247,9 +282,12 @@ public class ServiceApp {
         vars.put("SPRING_DATASOURCE_USERNAME", databaseSecret.secretValueFromJson("username").unsafeUnwrap());
         vars.put("SPRING_DATASOURCE_PASSWORD", databaseSecret.secretValueFromJson("password").unsafeUnwrap());
         // --- Cognito Configuration ---
+        vars.put("COGNITO_USER_POOL_ID", cognitoOutputParameters.getUserPoolId());
         vars.put("COGNITO_CLIENT_ID", cognitoOutputParameters.getUserPoolClientId());
         vars.put("COGNITO_CLIENT_SECRET", cognitoOutputParameters.getUserPoolClientSecret());
-        vars.put("COGNITO_PROVIDER_URL", cognitoOutputParameters.getProviderUrl());
+        vars.put("AWS_REGION", Stack.of(scope).getRegion());
+        // --- S3 Configuration ---
+        vars.put("S3_BUCKET_NAME", s3OutputParameters.getS3BucketName());
         // --- App Configuration ---
         vars.put("APP_URL", "https://app.finance-log.com");
         return vars;
