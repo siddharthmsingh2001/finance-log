@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface UserService {
 
-    User registerNewUser(UUID cognitoSub, String email);
+    User registerNewUser(UUID cognitoSub, String email, String profileImageUrl);
 
     Optional<User> findByCognitoSub(UUID cognitoSub);
 

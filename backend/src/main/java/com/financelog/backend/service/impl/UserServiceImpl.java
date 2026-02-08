@@ -22,13 +22,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerNewUser(UUID cognitoSub, String email){
-        return userRepository.save(
-                User.create(
-                        cognitoSub,
-                        email
-                )
-        );
+    public User registerNewUser(UUID cognitoSub, String email,String profileImageUrl){
+        User user = User.create(cognitoSub, email);
+        if (profileImageUrl != null && !profileImageUrl.equals("default_image")) {
+            user.setProfileImageUrl(profileImageUrl);
+        }
+        return userRepository.save(user);
     }
 
 }

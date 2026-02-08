@@ -1,10 +1,10 @@
 package com.financelog.backend.service;
 
 import com.financelog.backend.dto.UserDto;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import com.financelog.backend.entity.AuthenticatedUser;
 
 public interface OrchestrationService {
 
-    UserDto getOrCreateUser(OidcUser oidcUser);
+    UserDto getOrCreateUser(AuthenticatedUser authUser);
 
 }

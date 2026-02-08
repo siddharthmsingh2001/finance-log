@@ -16,21 +16,8 @@ spring:
   flyway:
     enabled: true
     clean-disabled: false
-  security:
-    oauth2:
-      client:
-        registration:
-          cognito:
-            client-id: ${COGNITO_CLIENT_ID}
-            client-secret: ${COGNITO_CLIENT_SECRET}
-            scope:
-              - openid
-              - email
-              - profile
-            authorization-grant-type: authorization_code
-        provider:
-          cognito:
-            issuer-uri: ${COGNITO_PROVIDER_URL}
+
+
 
 server:
   port: 8080
@@ -61,8 +48,16 @@ api:
   user:
     version: "v1"
   auth:
+    version: "v1"
+  aws:
+    region: ${AWS_REGION:ap-south-1}
     cognito:
-      logoutUrl: "https://finance-log.auth.ap-south-1.amazoncognito.com/logout"
+      userPoolId: ${COGNITO_USER_POOL_ID}
+      clientId: ${COGNITO_CLIENT_ID}
+      clientSecret: ${COGNITO_CLIENT_SECRET}
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+
 
 logging:
   level:

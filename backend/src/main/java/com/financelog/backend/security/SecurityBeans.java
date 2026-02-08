@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -17,18 +19,9 @@ import java.util.List;
 @Configuration
 public class SecurityBeans {
 
-    private final String cognitoLogoutUrl;
-    private final String clientId;
-    private final String appUrl;
 
     public SecurityBeans(
-            @Value("${api.auth.cognito.logoutUrl}") String cognitoLogoutUrl,
-            @Value("${spring.security.oauth2.client.registration.cognito.client-id}") String clientId,
-            @Value("${api.app.url}") String appUrl
     ){
-        this.cognitoLogoutUrl = cognitoLogoutUrl;
-        this.clientId = clientId;
-        this.appUrl = appUrl;
     }
 
     @Bean
@@ -38,21 +31,14 @@ public class SecurityBeans {
                 "http://localhost:5173",
                 "https://app.finance-log.com"
         ));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Authorization", "Content-Type", "ETag"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    @Bean
-    AuthenticationSuccessHandler authenticationSuccessHandler(){
-        return (request, response, authentication) -> {
-            response.sendRedirect("https://app.finance-log.com/");
-        };
     }
 
     @Bean
@@ -62,16 +48,11 @@ public class SecurityBeans {
         };
     }
 
+    /**
+     * Returns an empty manager so SpringSecurity stops generating random password.
+     */
     @Bean
-    LogoutSuccessHandler logoutSuccessHandler(){
-        return (request, response, authentication) -> {
-            String redirectUrl = UriComponentsBuilder
-                    .fromUriString(cognitoLogoutUrl)
-                    .queryParam("client_id", clientId)
-                    .queryParam("logout_uri", appUrl)
-                    .build()
-                    .toUriString();
-            response.sendRedirect(redirectUrl);
-        };
+    public UserDetailsService userDetailsService(){
+        return new InMemoryUserDetailsManager();
     }
 }

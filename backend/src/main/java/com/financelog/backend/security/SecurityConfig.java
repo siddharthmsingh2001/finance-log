@@ -2,72 +2,63 @@ package com.financelog.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final AuthenticationSuccessHandler authSuccessHandler;
     private final AuthenticationEntryPoint authEntryPoint;
-    private final LogoutSuccessHandler logoutSuccessHandler;
 
-    public SecurityConfig(
-            AuthenticationSuccessHandler authSuccessHandler,
-            AuthenticationEntryPoint authEntryPoint,
-            LogoutSuccessHandler logoutSuccessHandler
-    ){
-        this.authSuccessHandler = authSuccessHandler;
+    public SecurityConfig(AuthenticationEntryPoint authEntryPoint) {
         this.authEntryPoint = authEntryPoint;
-        this.logoutSuccessHandler = logoutSuccessHandler;
     }
 
+    /**
+     * CHAIN 1: Public Endpoints (Auth, Health, and Pre-Signup Utilities)
+     */
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    @Order(1)
+    public SecurityFilterChain authFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/**")
+                .securityMatcher("/v1/auth/**", "/actuator/health", "/v1/user/upload-url")
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/actuator/health",
-                                "/login",
-                                "/logout",
-                                "/error",
-                                "/oauth2/**"
-                        ).permitAll()
+                        .requestMatchers("/v1/auth/**", "/actuator/health", "/v1/user/upload-url").permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/oauth2/authorization/cognito")
-                        .successHandler(authSuccessHandler)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
+    }
+
+    /**
+     * CHAIN 2: Protected Application API
+     */
+    @Bean
+    @Order(2)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/v1/user/**") // Catch all user-related endpoints
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(auth -> auth
+                        // Everything else in /v1/user (like /v1/user/me) requires a session
+                        .anyRequest().authenticated()
                 )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessHandler(logoutSuccessHandler)
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
-                )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(authEntryPoint)
-                )
-                .securityContext(securityContext -> securityContext
-                        .requireExplicitSave(false)
-                )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 );
+
         return http.build();
     }
 }
