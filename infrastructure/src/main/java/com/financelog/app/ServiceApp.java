@@ -232,7 +232,7 @@ public class ServiceApp {
                         s3OutputParameters
                 )
         )
-                .withTaskRolePolicyStatements(List.of(cognitoPolicy));
+                .withTaskRolePolicyStatements(List.of(cognitoPolicy, s3Policy));
 
         // Defining the Construct
         ServiceConstruct serviceConstruct = new ServiceConstruct(
