@@ -59,6 +59,6 @@
     "bootstrap": "cdk bootstrap --app \"./mvnw -e -q compile exec:java -Dexec.mainClass=com.financelog.app.BootstrapApp\""
   },
   "devDependencies": {
-    "aws-cdk": "^2.170.0"
+    "aws-cdk": "^2.1100.0"
   }
 }
